@@ -1,4 +1,4 @@
-package de.lolhens.fs2.pcap
+package de.lolhens.fs2.pcap.sample
 
 import cats.effect.ExitCode
 import de.lolhens.fs2.pcap
@@ -18,13 +18,13 @@ object Sample extends TaskApp {
     (for {
       networkInterface <- pcap.networkInterfaces[Task]
       _ = println(networkInterface.getDescription)
-      handle <- Stream.resource(pcap.handle[Task](networkInterface)(_
+      handle <- Stream.resource(pcap.capture[Task](networkInterface)(_
         .promiscuousMode(PromiscuousMode.PROMISCUOUS)
       ))
     } yield {
       handle.setFilter("", BpfCompileMode.OPTIMIZE)
 
-      dispatchPackets[Task](handle)
+      pcap.dispatchPackets[Task](handle)
         .zipWithIndex
         .map { case (packet, index) =>
           println(

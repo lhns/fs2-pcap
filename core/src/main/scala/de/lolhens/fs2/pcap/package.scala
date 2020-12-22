@@ -9,25 +9,25 @@ import org.pcap4j.packet.factory.{PacketFactories, PacketFactory}
 import org.pcap4j.packet.namednumber.{DataLinkType, NamedNumber}
 
 import java.util.concurrent.Executor
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
-import scala.jdk.CollectionConverters._
 
 package object pcap {
   def networkInterfaces[F[_]](implicit F: Sync[F]): Stream[F, PcapNetworkInterface] =
     Stream.evalSeq(F.delay(Pcaps.findAllDevs.asScala.toSeq))
 
-  def handle[F[_]](deviceName: String)
-                  (builder: PcapHandle.Builder => PcapHandle.Builder)
-                  (implicit F: Sync[F]): Resource[F, PcapHandle] = Resource.make(F.delay(
+  def capture[F[_]](deviceName: String)
+                   (builder: PcapHandle.Builder => PcapHandle.Builder)
+                   (implicit F: Sync[F]): Resource[F, PcapHandle] = Resource.make(F.delay(
     builder(new PcapHandle.Builder(deviceName)).build()
   ))(handle => F.delay(
     handle.close()
   ))
 
-  def handle[F[_]](networkInterface: PcapNetworkInterface)
-                  (builder: PcapHandle.Builder => PcapHandle.Builder)
-                  (implicit F: Sync[F]): Resource[F, PcapHandle] =
-    handle(networkInterface.getName)(builder)
+  def capture[F[_]](networkInterface: PcapNetworkInterface)
+                   (builder: PcapHandle.Builder => PcapHandle.Builder)
+                   (implicit F: Sync[F]): Resource[F, PcapHandle] =
+    capture(networkInterface.getName)(builder)
 
   private val syncExecutor: Executor = (command: Runnable) => command.run()
 
@@ -41,8 +41,8 @@ package object pcap {
     buffer.take(i)
   }
 
-
-  def decodePackets[F[_], T, N <: NamedNumber[_, _]](packetFactory: PacketFactory[T, N], number: N): Pipe[F, Array[Byte], T] = _.map(packet =>
+  def decodePackets[F[_], T, N <: NamedNumber[_, _]](packetFactory: PacketFactory[T, N],
+                                                     number: N): Pipe[F, Array[Byte], T] = _.map(packet =>
     packetFactory.newInstance(packet, 0, packet.length, number)
   )
 
