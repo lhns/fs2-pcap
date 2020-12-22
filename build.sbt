@@ -63,7 +63,6 @@ lazy val core = projectMatrix.in(file("core"))
     libraryDependencies ++= Seq(
       "org.scalameta" %% "munit" % "0.7.17" % Test,
       "org.pcap4j" % "pcap4j-core" % "1.8.2",
-      "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2",
       "co.fs2" %% "fs2-core" % "2.5.0",
     ),
 
@@ -78,6 +77,7 @@ lazy val sample = projectMatrix.in(file("sample"))
 
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2",
       "io.monix" %% "monix" % "3.3.0",
     ),
 
