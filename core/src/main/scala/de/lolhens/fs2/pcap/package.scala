@@ -48,8 +48,11 @@ package object pcap {
 
   private lazy val packetFactory = PacketFactories.getFactory(classOf[Packet], classOf[DataLinkType])
 
+  def decodePackets[F[_]](dataLinkType: DataLinkType): Pipe[F, Array[Byte], Packet] =
+    decodePackets(packetFactory, dataLinkType)
+
   def decodePackets[F[_]](handle: PcapHandle): Pipe[F, Array[Byte], Packet] =
-    decodePackets(packetFactory, handle.getDlt)
+    decodePackets(handle.getDlt)
 
   def encodePackets[F[_]]: Pipe[F, Packet, Array[Byte]] = _.map(_.getRawData)
 
