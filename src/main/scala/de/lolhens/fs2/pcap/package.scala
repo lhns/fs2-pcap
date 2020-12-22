@@ -1,17 +1,34 @@
 package de.lolhens.fs2
 
-import cats.effect.{Sync, Timer}
+import cats.effect.{Resource, Sync, Timer}
 import fs2.{Chunk, Pipe, Stream}
-import org.pcap4j.core.PcapHandle
 import org.pcap4j.core.PcapHandle.BlockingMode
+import org.pcap4j.core.{PcapHandle, PcapNetworkInterface, Pcaps}
 import org.pcap4j.packet.Packet
-import org.pcap4j.packet.factory.PacketFactories
-import org.pcap4j.packet.namednumber.DataLinkType
+import org.pcap4j.packet.factory.{PacketFactories, PacketFactory}
+import org.pcap4j.packet.namednumber.{DataLinkType, NamedNumber}
 
 import java.util.concurrent.Executor
 import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
 
 package object pcap {
+  def networkInterfaces[F[_]](implicit F: Sync[F]): Stream[F, PcapNetworkInterface] =
+    Stream.evalSeq(F.delay(Pcaps.findAllDevs.asScala.toSeq))
+
+  def handle[F[_]](deviceName: String)
+                  (builder: PcapHandle.Builder => PcapHandle.Builder)
+                  (implicit F: Sync[F]): Resource[F, PcapHandle] = Resource.make(F.delay(
+    builder(new PcapHandle.Builder(deviceName)).build()
+  ))(handle => F.delay(
+    handle.close()
+  ))
+
+  def handle[F[_]](networkInterface: PcapNetworkInterface)
+                  (builder: PcapHandle.Builder => PcapHandle.Builder)
+                  (implicit F: Sync[F]): Resource[F, PcapHandle] =
+    handle(networkInterface.getName)(builder)
+
   private val syncExecutor: Executor = (command: Runnable) => command.run()
 
   private def getNextRawPackets(handle: PcapHandle, packetCount: Int): Array[Array[Byte]] = {
@@ -24,38 +41,46 @@ package object pcap {
     buffer.take(i)
   }
 
+
+  def decodePackets[F[_], T, N <: NamedNumber[_, _]](packetFactory: PacketFactory[T, N], number: N): Pipe[F, Array[Byte], T] = _.map(packet =>
+    packetFactory.newInstance(packet, 0, packet.length, number)
+  )
+
   private lazy val packetFactory = PacketFactories.getFactory(classOf[Packet], classOf[DataLinkType])
 
-  def decodePackets[F[_]](handle: PcapHandle): Pipe[F, Array[Byte], Packet] = _.map(packet =>
-    packetFactory.newInstance(packet, 0, packet.length, handle.getDlt)
-  )
+  def decodePackets[F[_]](handle: PcapHandle): Pipe[F, Array[Byte], Packet] =
+    decodePackets(packetFactory, handle.getDlt)
 
   def encodePackets[F[_]]: Pipe[F, Packet, Array[Byte]] = _.map(_.getRawData)
 
-  def receiveRawPackets[F[_]](handle: PcapHandle,
-                              packetCount: Int = 512,
-                              yieldTime: FiniteDuration = 10.millis)
-                             (implicit F: Sync[F], timer: Timer[F]): Stream[F, Array[Byte]] = Stream.suspend {
+  def dispatchRawPackets[F[_]](handle: PcapHandle,
+                               chunkSize: Int = 512,
+                               yieldTime: FiniteDuration = 10.millis)
+                              (implicit F: Sync[F], timer: Timer[F]): Stream[F, Array[Byte]] = Stream.suspend {
     handle.setBlockingMode(BlockingMode.NONBLOCKING)
 
-    Stream.evalUnChunk[F, Array[Byte]](F.delay(Chunk.array(getNextRawPackets(handle, packetCount))))
+    Stream.eval(F.delay(Chunk.array(getNextRawPackets(handle, chunkSize))))
       .repeat
-      .chunks
       .flatMap(rawPackets =>
         if (rawPackets.isEmpty) Stream.sleep_(yieldTime)
         else Stream.chunk(rawPackets)
       )
   }
 
-  def receivePackets[F[_]](handle: PcapHandle,
-                           packetCount: Int = 512,
-                           yieldTime: FiniteDuration = 10.millis)
-                          (implicit F: Sync[F], timer: Timer[F]): Stream[F, Packet] =
-    receiveRawPackets[F](handle, packetCount, yieldTime)
+  def dispatchPackets[F[_]](handle: PcapHandle,
+                            chunkSize: Int = 512,
+                            yieldTime: FiniteDuration = 10.millis)
+                           (implicit F: Sync[F], timer: Timer[F]): Stream[F, Packet] =
+    dispatchRawPackets[F](handle, chunkSize, yieldTime)
       .through(decodePackets(handle))
 
   def sendRawPackets[F[_]](handle: PcapHandle)
                           (implicit F: Sync[F]): Pipe[F, Array[Byte], Unit] = _.evalMap(rawPacket =>
     F.delay(handle.sendPacket(rawPacket))
-  )
+  ).drain ++ Stream.emit(())
+
+  def sendPackets[F[_]](handle: PcapHandle)
+                       (implicit F: Sync[F]): Pipe[F, Packet, Unit] =
+    encodePackets[F]
+      .andThen(sendRawPackets(handle))
 }
