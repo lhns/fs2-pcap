@@ -6,7 +6,7 @@
 [![Apache License 2.0](https://img.shields.io/github/license/LolHens/fs2-pcap.svg?maxAge=3600)](https://www.apache.org/licenses/LICENSE-2.0)
 
 This project provides [fs2](https://github.com/typelevel/fs2) helper methods
-for [pcap4j](https://github.com/kaitoy/pcap4j). Have a look at the `sample` submodule to get started.
+for [pcap4j](https://github.com/kaitoy/pcap4j). Have a look at the [sample](https://github.com/LolHens/fs2-pcap/blob/main/sample/src/main/scala/de/lolhens/fs2/pcap/sample/Sample.scala) to get started.
 
 ## Usage
 
