@@ -8,6 +8,7 @@ import org.pcap4j.packet.Packet
 import org.pcap4j.packet.factory.{PacketFactories, PacketFactory}
 import org.pcap4j.packet.namednumber.{DataLinkType, NamedNumber}
 
+import java.util.ConcurrentModificationException
 import java.util.concurrent.Executor
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -33,11 +34,17 @@ package object pcap {
 
   private def getNextRawPackets(handle: PcapHandle, packetCount: Int): Array[Array[Byte]] = {
     val buffer = new Array[Array[Byte]](packetCount)
+
     var i = 0
-    handle.dispatch(packetCount, { packet: Array[Byte] =>
-      buffer(i) = packet
-      i += 1
+    val expected = handle.dispatch(packetCount, { packet: Array[Byte] =>
+      val index = i
+      buffer(index) = packet
+      i = index + 1
     }, syncExecutor)
+
+    if (i != expected)
+      throw new ConcurrentModificationException("Callback in PcapHandle.dispatch was called concurrently!")
+
     buffer.take(i)
   }
 
