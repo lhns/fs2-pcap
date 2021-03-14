@@ -1,4 +1,4 @@
-lazy val scalaVersions = Seq("2.13.4", "2.12.13")
+lazy val scalaVersions = Seq("2.13.5", "2.12.12")
 
 ThisBuild / scalaVersion := scalaVersions.head
 
@@ -21,7 +21,7 @@ lazy val commonSettings: SettingsDefinition = Def.settings(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalameta" %% "munit" % "0.7.20" % Test,
+    "org.scalameta" %% "munit" % "0.7.22" % Test,
     "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
   ),
 
@@ -70,7 +70,7 @@ lazy val core = projectMatrix.in(file("core"))
     libraryDependencies ++= Seq(
       "org.pcap4j" % "pcap4j-core" % "1.8.2",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
-      "co.fs2" %% "fs2-core" % "2.5.0",
+      "co.fs2" %% "fs2-core" % "2.5.3",
     ),
   )
   .jvmPlatform(scalaVersions)
