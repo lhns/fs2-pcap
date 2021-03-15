@@ -13,7 +13,7 @@ for [pcap4j](https://github.com/kaitoy/pcap4j). Have a look at the [sample](http
 ### build.sbt
 
 ```sbt
-libraryDependencies += "de.lolhens" %% "fs2-pcap" % "0.0.2"
+libraryDependencies += "de.lolhens" %% "fs2-pcap" % "0.0.3"
 ```
 
 ## License
