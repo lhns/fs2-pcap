@@ -7,9 +7,7 @@ import org.pcap4j.packet.namednumber.{DataLinkType, EtherType}
 import org.pcap4j.packet.{EthernetPacket, Packet}
 import org.pcap4j.util.MacAddress
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class Tests extends munit.FunSuite {
+class Tests extends IOSuite {
   test("encode and decode Packets") {
     val ethernetPacket: Packet = new EthernetPacket.Builder()
       .srcAddr(MacAddress.getByName("00:00:00:00:00:00"))
@@ -23,7 +21,6 @@ class Tests extends munit.FunSuite {
       .through(pcap.decodePackets(DataLinkType.EN10MB))
       .compile
       .toList
-      .unsafeToFuture()
       .map { decoded =>
         assertEquals(decoded, List(ethernetPacket))
       }

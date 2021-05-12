@@ -1,6 +1,6 @@
 package de.lolhens.fs2
 
-import cats.effect.{Resource, Sync, Timer}
+import cats.effect.{Async, Resource, Sync}
 import fs2.{Chunk, Pipe, Stream}
 import org.pcap4j.core.PcapHandle.BlockingMode
 import org.pcap4j.core.{PcapHandle, PcapNetworkInterface, Pcaps}
@@ -66,7 +66,7 @@ package object pcap {
   def dispatchRawPackets[F[_]](handle: PcapHandle,
                                chunkSize: Int = 512,
                                yieldTime: FiniteDuration = 10.millis)
-                              (implicit F: Sync[F], timer: Timer[F]): Stream[F, Array[Byte]] = Stream.suspend {
+                              (implicit F: Async[F]): Stream[F, Array[Byte]] = Stream.suspend {
     handle.setBlockingMode(BlockingMode.NONBLOCKING)
 
     Stream.eval(F.delay(Chunk.array(getNextRawPackets(handle, chunkSize))))
@@ -80,7 +80,7 @@ package object pcap {
   def dispatchPackets[F[_]](handle: PcapHandle,
                             chunkSize: Int = 512,
                             yieldTime: FiniteDuration = 10.millis)
-                           (implicit F: Sync[F], timer: Timer[F]): Stream[F, Packet] =
+                           (implicit F: Async[F]): Stream[F, Packet] =
     dispatchRawPackets[F](handle, chunkSize, yieldTime)
       .through(decodePackets(handle))
 
