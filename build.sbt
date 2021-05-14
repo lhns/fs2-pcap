@@ -84,7 +84,7 @@ lazy val sample = projectMatrix.in(file("sample"))
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2",
-      "io.monix" %% "monix" % "3.3.0",
+      "io.monix" %% "monix" % "3.4.0",
     ),
 
     publish / skip := true,
