@@ -1,4 +1,4 @@
-lazy val scalaVersions = Seq("2.13.6", "2.12.13")
+lazy val scalaVersions = Seq("2.13.6", "2.12.14")
 
 ThisBuild / scalaVersion := scalaVersions.head
 ThisBuild / versionScheme := Some("early-semver")
@@ -71,7 +71,7 @@ lazy val core = projectMatrix.in(file("core"))
     libraryDependencies ++= Seq(
       "org.pcap4j" % "pcap4j-core" % "1.8.2",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
-      "co.fs2" %% "fs2-core" % "3.0.4",
+      "co.fs2" %% "fs2-core" % "2.5.7",
     ),
   )
   .jvmPlatform(scalaVersions)
