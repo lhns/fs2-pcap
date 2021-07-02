@@ -22,7 +22,7 @@ lazy val commonSettings: SettingsDefinition = Def.settings(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalameta" %% "munit" % "0.7.26" % Test,
+    "org.scalameta" %% "munit" % "0.7.27" % Test,
     "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
   ),
 
