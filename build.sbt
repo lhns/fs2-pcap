@@ -23,7 +23,7 @@ lazy val commonSettings: SettingsDefinition = Def.settings(
 
   libraryDependencies ++= Seq(
     "org.scalameta" %% "munit" % "0.7.27" % Test,
-    "ch.qos.logback" % "logback-classic" % "1.2.3" % Test,
+    "ch.qos.logback" % "logback-classic" % "1.2.4" % Test,
   ),
 
   testFrameworks += new TestFramework("munit.Framework"),
@@ -82,7 +82,7 @@ lazy val sample = projectMatrix.in(file("sample"))
     name := "fs2-pcap-sample",
 
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "ch.qos.logback" % "logback-classic" % "1.2.4",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2",
       "io.monix" %% "monix" % "3.4.0",
     ),
