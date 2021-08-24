@@ -71,7 +71,7 @@ lazy val core = projectMatrix.in(file("core"))
     libraryDependencies ++= Seq(
       "org.pcap4j" % "pcap4j-core" % "1.8.2",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
-      "co.fs2" %% "fs2-core" % "2.5.9",
+      "co.fs2" %% "fs2-core" % "3.1.1",
     ),
   )
   .jvmPlatform(scalaVersions)
