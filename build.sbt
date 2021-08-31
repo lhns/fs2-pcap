@@ -22,7 +22,7 @@ lazy val commonSettings: SettingsDefinition = Def.settings(
   ),
 
   libraryDependencies ++= Seq(
-    "org.scalameta" %% "munit" % "0.7.28" % Test,
+    "org.scalameta" %% "munit" % "0.7.29" % Test,
     "ch.qos.logback" % "logback-classic" % "1.2.5" % Test,
   ),
 
@@ -69,9 +69,10 @@ lazy val core = projectMatrix.in(file("core"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.pcap4j" % "pcap4j-core" % "1.8.2",
-      "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
       "co.fs2" %% "fs2-core" % "3.1.1",
+      "org.pcap4j" % "pcap4j-core" % "1.8.2",
+      "de.lolhens" %% "munit-tagless-final" % "0.1.2" % Test,
+      "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
     ),
   )
   .jvmPlatform(scalaVersions)
@@ -84,7 +85,6 @@ lazy val sample = projectMatrix.in(file("sample"))
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % "1.2.5",
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2",
-      "io.monix" %% "monix" % "3.4.0",
     ),
 
     publish / skip := true,
