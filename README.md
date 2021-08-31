@@ -14,7 +14,11 @@ for [pcap4j](https://github.com/kaitoy/pcap4j). Have a look at the [sample](http
 ### build.sbt
 
 ```sbt
+// use this snippet for cats-effect 2
 libraryDependencies += "de.lolhens" %% "fs2-pcap" % "0.0.3"
+
+// use this snippet for cats-effect 3
+libraryDependencies += "de.lolhens" %% "fs2-pcap" % "0.1.0"
 ```
 
 ## License
