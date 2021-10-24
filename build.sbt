@@ -69,7 +69,7 @@ lazy val core = projectMatrix.in(file("core"))
   .settings(commonSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "co.fs2" %% "fs2-core" % "3.1.6",
+      "co.fs2" %% "fs2-core" % "3.2.0",
       "org.pcap4j" % "pcap4j-core" % "1.8.2",
       "de.lolhens" %% "munit-tagless-final" % "0.1.3" % Test,
       "org.pcap4j" % "pcap4j-packetfactory-static" % "1.8.2" % Test,
