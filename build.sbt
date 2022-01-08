@@ -10,7 +10,7 @@ lazy val commonSettings: SettingsDefinition = Def.settings(
 
   licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")),
 
-  homepage := Some(url("https://github.com/LolHens/fs2-pcap")),
+  homepage := scmInfo.value.map(_.browseUrl),
   scmInfo := Some(
     ScmInfo(
       url("https://github.com/LolHens/fs2-pcap"),
